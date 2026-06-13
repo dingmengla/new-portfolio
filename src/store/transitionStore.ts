@@ -20,7 +20,8 @@ interface TransitionStore {
 
 export const useTransitionStore = create<TransitionStore>((set) => ({
   isTransitioning: false,
-  triggerTransition: (href) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  triggerTransition: (href, _fromImage, _toImage) => {
     set({ isTransitioning: true });
     router?.push(href);
   },

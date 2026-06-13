@@ -85,7 +85,7 @@ function CoverCursor({
   glowRef,
   isMobile,
 }: {
-  glowRef: React.RefObject<HTMLDivElement | null>;
+  glowRef: React.RefObject<HTMLDivElement>;
   isMobile: boolean;
 }) {
   const dotRef = useRef<HTMLDivElement>(null);
