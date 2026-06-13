@@ -20,7 +20,7 @@ interface TransitionStore {
 
 export const useTransitionStore = create<TransitionStore>((set) => ({
   isTransitioning: false,
-  triggerTransition: (href, _fromImage, _toImage) => {
+  triggerTransition: (href) => {
     set({ isTransitioning: true });
     router?.push(href);
   },

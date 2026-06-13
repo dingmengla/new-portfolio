@@ -148,6 +148,7 @@ export function useWaveVideo(
         clearTimeout(fadeTimerRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoRef]);
 
   const triggerWave = useCallback(() => {
@@ -173,6 +174,7 @@ export function useWaveVideo(
     }
 
     playWave();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoRef]);
 
   return { triggerWave };
