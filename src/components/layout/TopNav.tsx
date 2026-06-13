@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
+import { usePageNavigation } from "@/hooks/usePageNavigation";
 import { cn } from "@/lib/utils";
 
 const chapters = [
@@ -14,6 +14,7 @@ const chapters = [
 
 export function TopNav() {
   const pathname = usePathname();
+  const { navigateTo } = usePageNavigation();
 
   return (
     <motion.header
@@ -26,12 +27,13 @@ export function TopNav() {
         className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 md:px-6"
         aria-label="Site chapters"
       >
-        <Link
-          href="/cover"
+        <button
+          type="button"
+          onClick={() => navigateTo("/cover")}
           className="font-mono text-xs tracking-widest text-neutral-500 uppercase transition-colors hover:text-neutral-200"
         >
           Portfolio
-        </Link>
+        </button>
 
         <ul className="flex items-center gap-1 md:gap-2">
           {chapters.map(({ href, label }) => {
@@ -40,8 +42,13 @@ export function TopNav() {
 
             return (
               <li key={href}>
-                <Link
-                  href={href}
+                <motion.button
+                  type="button"
+                  onClick={() => navigateTo(href)}
+                  whileHover={{
+                    opacity: 1,
+                    transition: { type: "spring", stiffness: 400, damping: 20 },
+                  }}
                   className={cn(
                     "rounded-full px-3 py-1.5 font-mono text-xs tracking-wide transition-colors md:px-4",
                     isActive
@@ -51,7 +58,7 @@ export function TopNav() {
                   aria-current={isActive ? "page" : undefined}
                 >
                   {label}
-                </Link>
+                </motion.button>
               </li>
             );
           })}

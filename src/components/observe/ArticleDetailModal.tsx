@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { easeTween, springBounce } from "@/lib/animations";
 import type { ObserveArticle } from "@/lib/observe";
@@ -7,9 +8,67 @@ import type { ObserveArticle } from "@/lib/observe";
 interface ArticleDetailModalProps {
   article: ObserveArticle;
   onClose: () => void;
+  onNavigateNext?: () => void;
 }
 
-export function ArticleDetailModal({ article, onClose }: ArticleDetailModalProps) {
+export function ArticleDetailModal({
+  article,
+  onClose,
+  onNavigateNext,
+}: ArticleDetailModalProps) {
+  const articleRef = useRef<HTMLElement>(null);
+  const triggeredRef = useRef(false);
+
+  useEffect(() => {
+    const el = articleRef.current;
+    if (!el || !onNavigateNext) return;
+
+    triggeredRef.current = false;
+
+    const canNavigate = (deltaY: number) => {
+      if (triggeredRef.current || deltaY <= 0) return false;
+      const atBottom =
+        el.scrollTop + el.clientHeight >= el.scrollHeight - 20;
+      const noOverflow = el.scrollHeight <= el.clientHeight + 20;
+      return atBottom || noOverflow;
+    };
+
+    const navigate = (deltaY: number) => {
+      if (!canNavigate(deltaY)) return;
+      triggeredRef.current = true;
+      onNavigateNext();
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (!canNavigate(e.deltaY)) return;
+      e.preventDefault();
+      navigate(e.deltaY);
+    };
+
+    let lastTouchY = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      lastTouchY = e.touches[0].clientY;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const currentY = e.touches[0].clientY;
+      const deltaY = lastTouchY - currentY;
+      lastTouchY = currentY;
+      navigate(deltaY);
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: true });
+
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+    };
+  }, [onNavigateNext]);
+
   return (
     <>
       <motion.div
@@ -24,6 +83,7 @@ export function ArticleDetailModal({ article, onClose }: ArticleDetailModalProps
 
       <div className="pointer-events-none fixed inset-0 z-[120] flex items-center justify-center p-4">
         <motion.article
+          ref={articleRef}
           layoutId={`observe-article-${article.id}`}
           transition={springBounce}
           className="pointer-events-auto relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-neutral-700 bg-[#1a1a1a] p-8 md:p-10"
@@ -55,7 +115,7 @@ export function ArticleDetailModal({ article, onClose }: ArticleDetailModalProps
           </h2>
           <p className="mt-1 text-sm italic text-neutral-500">{article.titleEn}</p>
 
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 hidden space-y-4 md:block">
             {article.quotes.map((quote, i) => (
               <blockquote
                 key={i}

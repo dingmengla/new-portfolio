@@ -2,12 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import {
-  setTransitionRouter,
-  useTransitionStore,
-} from "@/store/transitionStore";
+import { usePageNavigation } from "@/hooks/usePageNavigation";
 import { chapterTitleStyle, titleWordSpring } from "@/lib/typography";
+
+// vision.jpg 2000×1414 — hover-effect 需要 image height / image width 才能实现 cover 式居中裁剪
+const VISION_IMAGE_RATIO = 1414 / 2000;
 
 // 图片停留 3s 后触发溶解与文字入场 (ms)
 const DISSOLVE_DELAY = 3000;
@@ -168,18 +167,13 @@ function CoverCursor({
 export function SandDissolve() {
   const containerRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const trigger = useTransitionStore((s) => s.triggerTransition);
+  const { navigateTo } = usePageNavigation();
 
   const [textVisible, setTextVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { typedLine1, typedLine2, showCursor } = useTypewriter(textVisible);
   const [hoveredLine, setHoveredLine] = useState<number | null>(null);
   const [activeLine, setActiveLine] = useState<number | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    setTransitionRouter(router);
-  }, [router]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -196,15 +190,13 @@ export function SandDissolve() {
     let textTimer: ReturnType<typeof setTimeout>;
 
     import("hover-effect").then(({ default: HoverEffect }) => {
-      const ratio = window.innerHeight / window.innerWidth;
-
       const effect = new HoverEffect({
         parent: el,
         intensity: 0.1,
         image1: "/images/vision.jpg",
         image2: "/images/black.jpg",
         displacementImage: "/images/displacement.png",
-        imagesRatio: ratio,
+        imagesRatio: VISION_IMAGE_RATIO,
         speedIn: 10,
         speedOut: 2.5,
         easing: "power2.inOut",
@@ -277,9 +269,7 @@ export function SandDissolve() {
           pointerEvents: textVisible ? "auto" : "none",
           cursor: "pointer",
         }}
-        onClick={() =>
-          trigger("/experience", "/images/vision.jpg", "/images/home-bg.jpg")
-        }
+        onClick={() => navigateTo("/experience")}
         onMouseEnter={enlargeGlow}
         onMouseLeave={resetGlow}
       >
@@ -360,7 +350,8 @@ export function SandDissolve() {
               style={{
                 textAlign: "center",
                 userSelect: "none",
-                maxWidth: "90vw",
+                maxWidth: i === 1 ? (isMobile ? "88vw" : "min(90vw, 640px)") : "90vw",
+                whiteSpace: line.whiteSpace,
                 textShadow: isLineGlowing(lineIndex)
                   ? glowShadow
                   : line.textShadow,

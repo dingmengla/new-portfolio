@@ -8,7 +8,6 @@ import {
   type ObserveArticle,
   type ObserveQuoteSlide,
 } from "@/lib/observe";
-import { ChapterHeader } from "@/components/layout/ChapterHeader";
 import { springDefault } from "@/lib/animations";
 import { ArticleDetailModal } from "./ArticleDetailModal";
 import { cn } from "@/lib/utils";
@@ -62,7 +61,7 @@ function CenterQuote({ slide }: { slide: ObserveQuoteSlide }) {
   const cleanTitle = slide.articleTitle.replace(/[《》]/g, "");
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-1/2 z-[100] flex -translate-y-1/2 items-center justify-center px-8 md:px-16">
+    <div className="pointer-events-none fixed inset-x-0 top-1/2 z-[100] hidden -translate-y-1/2 items-center justify-center px-8 md:flex md:px-16">
       <AnimatePresence mode="wait">
         <motion.blockquote
           key={`${slide.articleId}-${slide.text.slice(0, 24)}`}
@@ -221,7 +220,11 @@ function CylinderCard({
 
 const WHEEL_SENSITIVITY = 0.2;
 
-export function FloatingWall() {
+interface FloatingWallProps {
+  onNavigateNext?: () => void;
+}
+
+export function FloatingWall({ onNavigateNext }: FloatingWallProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -348,16 +351,6 @@ export function FloatingWall() {
     >
       <ObserveBackground />
 
-      <ChapterHeader
-        as="h1"
-        className="pointer-events-auto absolute inset-x-0 top-20 z-30 px-6 md:top-24"
-        title="I Observe"
-        intro="Eyes open, mind curious. A collection of signals, stories, and shifts I've noticed along the way. Not just news—patterns that matter."
-        titleStyle={{ color: "rgba(255, 255, 255, 0.95)" }}
-        introClassName="max-w-xl"
-        introStyle={{ color: "rgba(255, 255, 255, 0.45)" }}
-      />
-
       {/* 圆柱场景层 */}
       <div
         className="absolute inset-0 z-10 flex cursor-grab items-center justify-center active:cursor-grabbing"
@@ -444,7 +437,11 @@ export function FloatingWall() {
 
       <AnimatePresence>
         {selectedArticle && (
-          <ArticleDetailModal article={selectedArticle} onClose={handleClose} />
+          <ArticleDetailModal
+            article={selectedArticle}
+            onClose={handleClose}
+            onNavigateNext={onNavigateNext}
+          />
         )}
       </AnimatePresence>
     </section>

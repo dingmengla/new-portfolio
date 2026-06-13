@@ -3,7 +3,9 @@ import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { BottomContact } from "@/components/layout/BottomContact";
+import { PageFadeIn } from "@/components/layout/PageFadeIn";
 import { TopNav } from "@/components/layout/TopNav";
+import { TransitionHost } from "@/components/transition/TransitionHost";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,8 +45,9 @@ export default function RootLayout({
     >
       <body className="font-sans bg-neutral-950 text-neutral-50 antialiased">
         <LenisProvider>
+          <TransitionHost />
           <TopNav />
-          {children}
+          <PageFadeIn>{children}</PageFadeIn>
           <BottomContact />
         </LenisProvider>
       </body>

@@ -125,7 +125,7 @@ export function HighlightCarousel() {
   }, [paginate]);
 
   return (
-    <section className="flex min-h-screen flex-col px-2 py-6 md:px-4 md:py-8">
+    <section className="flex min-h-screen flex-col px-2 pt-20 pb-6 md:px-4 md:pt-24 md:pb-8">
       <div className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col">
         <ChapterHeader
           className="px-2 md:px-4"

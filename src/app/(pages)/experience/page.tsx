@@ -1,14 +1,23 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { WaveContext } from "@/context/WaveContext";
 import { useWaveVideo } from "@/hooks/useWaveVideo";
+import { usePageNavigation } from "@/hooks/usePageNavigation";
+import { useScrollToNext } from "@/hooks/useScrollToNext";
 import { HighlightCarousel } from "@/components/experience/HighlightCarousel";
 import { Timeline } from "@/components/experience/Timeline";
 
 export default function ExperiencePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { triggerWave } = useWaveVideo(videoRef);
+  const { navigateTo } = usePageNavigation();
+
+  useScrollToNext(
+    useCallback(() => {
+      navigateTo("/observe");
+    }, [navigateTo])
+  );
 
   return (
     <WaveContext.Provider value={{ triggerWave }}>
